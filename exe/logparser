@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'logparser'
+require 'thor'
+
+class LogParserCLI < Thor
+  desc 'show list', 'show list'
+  option :type, default: 'most'
+
+  def show(file_path)
+    parser = ::Logparser::PARSER_TYPES[options[:type].to_sym]
+    raise ::Logparser::InvalidParserType, "Invalid parser type: #{options[:type]}" unless parser
+
+    parser.new(file_path).call
+  rescue ::Logparser::Error => e
+    puts e.message
+    exit
+  end
+end
+
+LogParserCLI.start(ARGV)
